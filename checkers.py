@@ -2,6 +2,8 @@ from tkinter import *
 import random
 import os
 root = Tk()
+
+
 n = 8
 k_prev = 0
 turns_amount = 0
@@ -25,6 +27,7 @@ def sort_set(l):
         if i not in a:
             a.append(i)
     return a
+
 def turns_conv(a):
     b = []
     for i in range(3):
@@ -35,6 +38,7 @@ def turns_conv(a):
             a = a[0]
         except TypeError:
             return b[-3]
+
 def sort_pos():
     possible_turns = []
     for i in range(len(froms)):
@@ -43,7 +47,8 @@ def sort_pos():
             x_y_to = pos[froms[i][0], froms[i][1]][j]
             possible_turns.append([x_y_from, x_y_to])
     return possible_turns
- def get_n():
+    
+def get_n():
     global b
     global type_choice
     global n
@@ -62,6 +67,7 @@ def sort_pos():
     graph()
     canv.delete
     mainloop()
+
 def oval_func(event):
      global x_y_from
      global x_y_to
@@ -72,6 +78,7 @@ def oval_func(event):
          abs_coord_y = root.winfo_pointery() - root.winfo_rooty()
          x_y_from = [(abs_coord_x // size) - 1, (abs_coord_y // size) - 1]
          ov_rect = 1
+
 def rect_func(event):
      global x_y_to
      global x_y_from
@@ -83,6 +90,7 @@ def rect_func(event):
          game()
          ov_rect = 0
          graph()
+
 def prev_board(event):
     global turn
     global k_prev
@@ -93,14 +101,17 @@ def prev_board(event):
         turn = 1
     k_prev += 1
     graph()    
+
 def start_pos(event):
     global turn
     global b
     b = Board()
     turn = 1
     graph()
+
 def zad_resh(event):
     reshenie(4)
+
 def reshenie(it):
     global turn
     global boards
@@ -226,6 +237,7 @@ def reshenie(it):
             print(jk_sum)
             print('----------------------------------------')    
         return(True)
+                                            
 def zad_gen(event):
     global turn
     global a
@@ -472,30 +484,41 @@ def game():
                                     turns_amount += 1
                                     prev_boards.append(Board())
                                     prev_boards[-1].reinit(ap.board)
+
 class Color(object):
     EMPTY = 0
     BLACK = 2
     WHITE = 1
+
 class Empty(object):
     color = Color.EMPTY
+
     def get_moves(self, board, x, y):
         moves = []
         return moves
 
     def __str__(self):
         return '.'
+
     def type_of(self, board, x, y):
         return Empty
+
 class CheckerMan(object):
     IMG = None
+
     def __init__(self, color):
         self.color = color
+
     def __str__(self):
         return self.IMG[0 if self.color == Color.WHITE else 1]
+
+
 class Checker(CheckerMan):
     IMG = ('б', 'ч')
+
     def type_of(self, board, x, y):
         return Checker
+
     def get_moves(self, board, x, y):
         moves = []
         deleted = []
@@ -555,10 +578,13 @@ class Checker(CheckerMan):
                                 moves.append([x-2, y-2])
                                 deleted.append([x-1, y-1])
         return moves, deleted
+
 class DamMan(object):
     IMG = None
+
     def type_of(self, board, x, y):
         return Dam
+
     def __init__(self, color):
         self.color = color
 
@@ -566,6 +592,7 @@ class DamMan(object):
         return self.IMG[0 if self.color == Color.WHITE else 1]
 class Dam(DamMan):
     IMG = ('3', '4')
+
     def get_moves(self, board, x, y):
         moves_zaf = []
         var = 0
@@ -627,6 +654,7 @@ class Dam(DamMan):
                                     if board.type_of((x - k) - c, (y + k) + c) == Empty:
                                         moves.append([(x - k) - c, (y + k) + c])
         return moves, d, deleted
+
 class Board(object):
     def __init__(self):
         self.board = [[Empty()] * n for y in range(n)]
@@ -650,18 +678,22 @@ class Board(object):
                     for j in range(n):
                         if j % 2 == 0:
                             self.board[i][j] = Checker(Color.BLACK)
+        
     def reinit(self, positions):
          for i in range(n):
               for j in range(n):
                    self.board[i][j] = positions[i][j]
+
     def ravn(self, positions):
          for i in range(n):
               for j in range(n):
                    if self.board[i][j] != positions[i][j]:
                        return False
          return True           
+    
     def type_of(self, x, y):
         return self.board[y][x].type_of(self, x, y)
+
     def get_turns(self, t):
         global pos
         global froms
@@ -700,11 +732,223 @@ class Board(object):
               win_side = 1
     def get_color(self, x, y):
         return self.board[y][x].color
+
     def get_deleted(self, x_f, y_f, x_t, y_t, t):
         if self.type_of(x_f, y_f) == Dam or self.type_of(x_f, y_f) == Checker:
             #print(x_f, y_f, x_t, y_t)
             if x_f > x_t and y_f > y_t:
                  for i in range(x_f - x_t):
                      if t == 1:
+                         if self.get_color(x_f - i, y_f - i) == Color.BLACK:
+                             return [x_f - i, y_f - i]
+                     elif t == 2:
+                         if self.get_color(x_f - i, y_f - i) == Color.WHITE:
+                             return [x_f - i, y_f - i]
+            if x_f > x_t and y_f < y_t:
+                 for i in range(x_f - x_t):
+                     if t == 1:
+                         if self.get_color(x_f - i, y_f + i) == Color.BLACK:
+                             return [x_f - i, y_f + i]
+                     elif t == 2:
+                         if self.get_color(x_f - i, y_f + i) == Color.WHITE:
+                             return [x_f - i, y_f + i]
+            if x_f < x_t and y_f < y_t:
+                 for i in range(x_t - x_f):
+                     if t == 1:
+                         if self.get_color(x_f + i, y_f + i) == Color.BLACK:
+                             return [x_f + i, y_f + i]
+                     elif t == 2:
+                         if self.get_color(x_f + i, y_f + i) == Color.WHITE:
+                             return [x_f + i, y_f + i]
+            if x_f < x_t and y_f > y_t:
+                 for i in range(x_t - x_f):
+                     if t == 1:
+                         if self.get_color(x_f + i, y_f - i) == Color.BLACK:
+                             return [x_f + i, y_f - i]
+                     elif t == 2:
+                         if self.get_color(x_f + i, y_f - i) == Color.WHITE:
+                             return [x_f + i, y_f - i]
+
+
+    def is_win(self):
+        global end_game
+        end_game = 0
+        for i in range(n):
+            for j in range(n):
+                if self.get_color(j, i) == turn:
+                    if len(self.get_moves(j, i)) != 0:
+                        end_game = 1
+        if end_game == 1:
+            return False
+        else:
+            return True
+
+    def get_moves(self, x, y):
+        return self.board[y][x].get_moves(self, x, y)
+
+    def move(self, xy_from, xy_to):
+        self.board[xy_to[1]][xy_to[0]] = self.board[xy_from[1]][xy_from[0]]
+        self.board[xy_from[1]][xy_from[0]] = Empty()
+
+    def delete(self, xy_del):
+        self.board[xy_del[1]][xy_del[0]] = Empty()
+
+    def dam_check(self, xy_to):
+        if self.board[xy_to[1]][xy_to[0]].color == Color.WHITE:
+            if xy_to[1] == n - 1:
+                self.board[xy_to[1]][xy_to[0]] = Dam(Color.WHITE)
+        elif self.board[xy_to[1]][xy_to[0]].color == Color.BLACK:
+            if xy_to[1] == 0:
+                self.board[xy_to[1]][xy_to[0]] = Dam(Color.BLACK)
+
+    def __str__(self):
+        res = ''
+        for y in range(n):
+            res += ''.join(str(y)) + ' '
+            res += ''.join(map(str, self.board[y])) + "\n"
+        return res
+
+    def zafuk(self, tu):
+        global n
+        var = 0
+        rub = 0
+        for j in range(n):
+            for i in range(n):
+                if self.type_of(i, j) == Checker:
+                    if self.board[j][i].color == tu:
+                        if self.board[j][i].color == Color.WHITE:
+                            if j + 1 <= n - 1 and i + 1 <= n - 1:
+                                if self.board[j + 1][i + 1].color == Color.BLACK:
+                                    if j + 2 <= n - 1 and i + 2 <= n - 1:
+                                        if self.board[j + 2][i + 2].color == Color.EMPTY:
+                                            return(True)
+                            if j + 1 <= n - 1 and i - 1 >= 0:
+                                if self.board[j + 1][i - 1].color == Color.BLACK:
+                                    if j + 2 <= n - 1 and i - 2 >= 0:
+                                        if self.board[j + 2][i - 2].color == Color.EMPTY:
+                                            return(True)
+                            if j - 1 >= 0 and i + 1 <= n - 1:
+                                if self.board[j - 1][i + 1].color == Color.BLACK:
+                                    if j - 2 >= 0 and i + 2 <= n - 1:
+                                        if self.board[j - 2][i + 2].color == Color.EMPTY:
+                                            return(True)
+                            if j - 1 >= 0 and i - 1 >= 0:
+                                if self.board[j - 1][i - 1].color == Color.BLACK:
+                                    if j - 2 >= 0 and i - 2 >= 0:
+                                        if self.board[j - 2][i - 2].color == Color.EMPTY:
+                                            return(True)
+                        elif self.board[j][i].color == Color.BLACK:
+                            if j - 1 >= 0 and i + 1 <= n - 1:
+                                if self.board[j - 1][i + 1].color == Color.WHITE:
+                                    if j - 2 >= 0 and i + 2 <= n - 1:
+                                        if self.board[j - 2][i + 2].color == Color.EMPTY:
+                                            return(True)
+                            if j - 1 >= 0 and i - 1 >= 0:
+                                if self.board[j - 1][i - 1].color == Color.WHITE:
+                                    if j - 2 >= 0 and i - 2 >= 0:
+                                        if self.board[j - 2][i - 2].color == Color.EMPTY:
+                                            return(True)
+                            if j + 1 <= n - 1 and i + 1 <= n - 1:
+                                if self.board[j + 1][i + 1].color == Color.WHITE:
+                                    if j + 2 <= n - 1 and i + 2 <= n - 1:
+                                        if self.board[j + 2][i + 2].color == Color.EMPTY:
+                                            return(True)
+                            if j + 1 <= n - 1 and i - 1 >= 0:
+                                if self.board[j + 1][i - 1].color == Color.WHITE:
+                                    if j + 2 <= n - 1 and i - 2 >= 0:
+                                        if self.board[j + 2][i - 2].color == Color.EMPTY:
+                                            return(True)
+                    else:
+                        continue
+                elif self.type_of(i, j) == Dam:
+                    if self.board[j][i].color == tu:
+                        if self.board[j][i].color == Color.WHITE:
+                            for c in range(n):
+                                if j + c <= n - 1 and i + c <= n - 1:
+                                    if self.board[j + c][i + c].color == Color.BLACK:
+                                        if j + (c + 1) <= n - 1 and i + (c + 1) <= n - 1:
+                                            if self.board[j + (c + 1)][i + (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j + c <= n - 1 and i - c >= 0:
+                                    if self.board[j + c][i - c].color == Color.BLACK:
+                                        if j + (c + 1) <= n - 1 and i - (c + 1) >= 0:
+                                            if self.board[j + (c + 1)][i - (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j - c >= 0 and i + c <= n - 1:
+                                    if self.board[j - c][i + c].color == Color.BLACK:
+                                        if j - (c + 1) >= 0 and i + (c + 1) <= n - 1:
+                                            if self.board[j - (c + 1)][i + (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j - c >= 0 and i - c >= 0:
+                                    if self.board[j - c][i - c].color == Color.BLACK:
+                                        if j - (c + 1) >= 0 and i - (c + 1) >= 0:
+                                            if self.board[j - (c + 1)][i - (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                        elif self.board[j][i].color == Color.BLACK:
+                            for c in range(n):
+                                if j + c <= n - 1 and i + c <= n - 1:
+                                    if self.board[j + c][i + c].color == Color.WHITE:
+                                        if j + (c + 1) <= n - 1 and i + (c + 1) <= n - 1:
+                                            if self.board[j + (c + 1)][i + (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j + c <= n - 1 and i - c >= 0:
+                                    if self.board[j + c][i - c].color == Color.WHITE:
+                                        if j + (c + 1) <= n - 1 and i - (c + 1) >= 0:
+                                            if self.board[j + (c + 1)][i - (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j - c >= 0 and i + c <= n - 1:
+                                    if self.board[j - c][i + c].color == Color.WHITE:
+                                        if j - (c + 1) >= 0 and i + (c + 1) <= n - 1:
+                                            if self.board[j - (c + 1)][i + (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+                                if j - c >= 0 and i - c >= 0:
+                                    if self.board[j - c][i - c].color == Color.WHITE:
+                                        if j - (c + 1) >= 0 and i - (c + 1) >= 0:
+                                            if self.board[j - (c + 1)][i - (c + 1)].color == Color.EMPTY:
+                                                return(True)
+                                            else:
+                                                return(False)
+        return(False)
+type_choice = 0
+
+message = IntVar()
+var = IntVar()
+
+message_label = Label(text='Выберите размер', fg='white', bg='#00032F', font='Verdana 20')
+message_label.place(relx=.2, rely=.1, anchor='c')
+message_entry = Entry(textvariable=message, width=20, font='Verdana 20')
+message_entry.delete(0, END); message_entry.insert(0, 8)
+message_entry.place(relx=.5, rely=.1, anchor="c")
+
+
+norm_check = Radiobutton(text='Обычная игра', value=1, variable=var, font='Verdana 20')
+norm_check.place(relx=.5, rely=.2, anchor="c")
+
+pod_check = Radiobutton(text='Поддавки', value=2, variable=var, font='Verdana 20')
+pod_check.place(relx=.5, rely=.3, anchor="c")
+
+message_button = Button(text="Начать игру", command=get_n, font='Verdana 20')
+message_button.place(relx=.5, rely=.5, anchor="c")
+
+canv.tag_bind('rect', '<Button-1>', rect_func)
+canv.tag_bind('prev', '<Button-1>', prev_board)
+canv.tag_bind('oval', '<Button-1>', oval_func)
+canv.tag_bind('button', '<Button-1>', zad_resh)
+canv.tag_bind('button1', '<Button-1>', zad_gen)
+canv.tag_bind('start_b', '<Button-1>', start_pos)
 
 
